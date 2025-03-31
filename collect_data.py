@@ -1,5 +1,3 @@
-# collect data
-
 import cv2
 import mediapipe as mp
 import pandas as pd
@@ -31,7 +29,7 @@ else:
     data, labels = [], []
 
 # ชื่อคำที่ต้องการเก็บข้อมูลใหม่
-label_names = ["1", "2","i love you"]
+label_names = ["1", "2"]
 
 cap = cv2.VideoCapture(0)
 
@@ -58,6 +56,7 @@ for label_index, label_name in enumerate(label_names, start=max(labels, default=
                 hand_type = handedness.classification[0].label  # 'Left' หรือ 'Right'
                 hand_label = f"{hand_type} Hand"
 
+                # บันทึกข้อมูลท่ามือ
                 data.append(landmark_list)
                 labels.append(label_index)
 

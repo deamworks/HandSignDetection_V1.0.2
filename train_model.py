@@ -1,4 +1,3 @@
-#train model
 import pandas as pd
 import joblib
 from sklearn.neighbors import KNeighborsClassifier

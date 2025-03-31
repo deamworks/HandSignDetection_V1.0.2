@@ -1,5 +1,3 @@
-#translate hand sign
-# translate hand sign
 import cv2
 import mediapipe as mp
 import numpy as np
@@ -7,7 +5,7 @@ import joblib  # โหลดโมเดล
 
 # โหลดโมเดล KNN
 model = joblib.load("hand_sign_model.pkl")
-label_names = ["1", "2","i love you"]
+label_names = ["1", "2"]
 
 # ตั้งค่า Mediapipe
 mp_hands = mp.solutions.hands
@@ -32,20 +30,17 @@ while cap.isOpened():
             # ดึงค่าตำแหน่งมือ
             landmark_list = [lm.x for lm in hand_landmarks.landmark] + [lm.y for lm in hand_landmarks.landmark]
 
-            # ตรวจสอบว่ามือข้างไหน
-            hand_type = handedness.classification[0].label  # 'Left' หรือ 'Right'
-            hand_label = f"{hand_type} Hand"
-
             # ทำนายผลลัพธ์
             if len(landmark_list) == model.n_features_in_:
                 prediction = model.predict([landmark_list])
-                predicted_text = f"{label_names[prediction[0]]}"
+                predicted_text = label_names[prediction[0]]
 
-                # วางข้อความสำหรับมือซ้าย
-                if hand_type == "Left":
-                    cv2.putText(image, f"{predicted_text} ({hand_label})", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
-                else:  # สำหรับมือขวา
-                    cv2.putText(image, f"{predicted_text} ({hand_label})", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
+                # ตรวจสอบมือซ้ายหรือมือขวา
+                hand_type = handedness.classification[0].label  # 'Left' หรือ 'Right'
+                hand_label = f"{hand_type} Hand"
+
+                # แสดงผลข้อความที่แยกมือซ้ายและมือขวา
+                cv2.putText(image, f"{hand_label}: {predicted_text}", (50, 50 + (40 * results.multi_hand_landmarks.index(hand_landmarks))), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
 
     cv2.imshow("Hand Sign Detection", image)
     if cv2.waitKey(1) & 0xFF == ord('q'):
