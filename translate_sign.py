@@ -1,4 +1,5 @@
 #translate hand sign
+# translate hand sign
 import cv2
 import mediapipe as mp
 import numpy as np
@@ -6,7 +7,7 @@ import joblib  # โหลดโมเดล
 
 # โหลดโมเดล KNN
 model = joblib.load("hand_sign_model.pkl")
-label_names = ["1", "2", "3", "4", "i love you"]
+label_names = ["1", "2","i love you"]
 
 # ตั้งค่า Mediapipe
 mp_hands = mp.solutions.hands
@@ -38,8 +39,13 @@ while cap.isOpened():
             # ทำนายผลลัพธ์
             if len(landmark_list) == model.n_features_in_:
                 prediction = model.predict([landmark_list])
-                predicted_text = f"{label_names[prediction[0]]} ({hand_label})"
-                cv2.putText(image, predicted_text, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
+                predicted_text = f"{label_names[prediction[0]]}"
+
+                # วางข้อความสำหรับมือซ้าย
+                if hand_type == "Left":
+                    cv2.putText(image, f"{predicted_text} ({hand_label})", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
+                else:  # สำหรับมือขวา
+                    cv2.putText(image, f"{predicted_text} ({hand_label})", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
 
     cv2.imshow("Hand Sign Detection", image)
     if cv2.waitKey(1) & 0xFF == ord('q'):
